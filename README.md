@@ -145,9 +145,11 @@ hytale-docker/
 
 | Puerto | Protocolo | Descripción |
 |--------|-----------|-------------|
-| `25565` | UDP | Puerto del servidor Hytale (QUIC) |
+| `5520` | UDP | Puerto por defecto del servidor Hytale (QUIC) |
 
 > ⚠️ **Importante**: Hytale usa **QUIC sobre UDP**, no TCP. Asegúrate de configurar firewalls y port forwarding correctamente.
+>
+> 🔧 Para cambiar el puerto, modifica el archivo `docker-compose.yml` o usa la variable de entorno del servidor.
 
 ---
 
