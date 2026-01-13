@@ -52,12 +52,15 @@ Este proyecto está actualmente en fase de desarrollo. Puede haber cambios impor
 git clone <repo-url>
 cd HytaleDocker
 
-# Modificar docker-compose.yml para usar tu imagen
-# Cambia YOUR_USERNAME/your-repo por tu nombre de repositorio real
+# Importante: Modificar docker-compose.yml para usar tu imagen
+# Cambia ghcr.io/YOUR_USERNAME/your-repo:main
+# Por tu repositorio real, ejemplo: ghcr.io/johndoe/hytale-docker:main
 
 # Iniciar el servidor
 docker-compose up -d
 ```
+
+> 💡 **Tip**: La imagen se construye automáticamente en GitHub Container Registry cada vez que haces push a la rama `main`.
 
 ### Opción B: Construir localmente
 
