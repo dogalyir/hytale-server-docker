@@ -121,35 +121,47 @@ The `auth.sh` script automates the entire OAuth2 Device Code Flow process:
 docker-compose --env-file hytale_tokens.env up -d
 ```
 
-#### 🔄 Automatic token refresh
+#### 🔄 Automatic token refresh & management
 
-> ⚡ **New feature**: Session tokens are automatically refreshed on every server start!
+> ⚡ **Automatic token management** - The server handles everything for you!
 
 **How it works:**
 
-1. The server checks if OAuth tokens (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) are available
-2. If available, it automatically:
+1. **First time setup**: Run `./auth.sh` once to generate tokens
+2. **Automatic saving**: Tokens are automatically saved to `hytale_data/.tokens/tokens.env`
+3. **Automatic refresh**: On every server start, the entrypoint:
+   - Loads saved tokens from `hytale_data/.tokens/`
    - Refreshes the OAuth access token using the refresh token
    - Creates a new game session with the refreshed access token
-   - Saves the new tokens for next time
-3. The server starts with fresh session tokens every time
+   - Saves all updated tokens
+4. **Continuous operation**: You don't need to worry about refreshing tokens!
 
 **Token expiration:**
 
-| Token Type | Expiration |
-|------------|------------|
-| OAuth Access Token | 1 hour (auto-refreshed) |
-| OAuth Refresh Token | 30 days |
-| Game Session | 1 hour (recreated on every start) |
+| Token Type | Expiration | Auto-refreshed? |
+|------------|------------|------------------|
+| OAuth Access Token | 1 hour | ✅ Yes |
+| OAuth Refresh Token | 30 days | ❌ No (run `./auth.sh`) |
+| Game Session | 1 hour | ✅ Yes (on server start) |
 
 **Manual refresh (if needed):**
 
 ```bash
-# Re-run the auth script to refresh all tokens
+# Re-run the auth script to refresh all tokens (every 30 days)
 ./auth.sh
 ```
 
-> 💡 **Tip**: Just provide the OAuth tokens (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) in your `hytale_tokens.env` file. The session tokens will be automatically refreshed on every server start!
+**Check token status:**
+
+```bash
+# Verify token validity and check expiration
+./check-tokens.sh
+
+# Or check tokens in a running container
+docker exec hytale-server /check-tokens.sh
+```
+
+> 💡 **Best practice**: Provide OAuth tokens (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) once. The server will automatically save them to `hytale_data/.tokens/` and refresh session tokens on every start!
 
 ---
 
@@ -162,7 +174,8 @@ hytale-docker/
 ├── 🐳 Dockerfile                      # Container image
 ├── 📦 docker-compose.yml               # Service orchestration
 ├── 🔧 entrypoint.sh                    # Initialization script
-├── 🔑 auth.sh                          # OAuth2 authentication script
+├── 🔐 auth.sh                        # OAuth2 authentication script
+├── 🔍 check-tokens.sh                # Token verification script
 ├── 💎 hytale_tokens.env                # Generated tokens (created automatically)
 ├── 📝 hytale_tokens.env.example        # Token file example
 ├── 📚 README.md                        # This documentation
@@ -178,7 +191,9 @@ hytale-docker/
     ├── Assets.zip                      # Game assets
     ├── universe/                       # Worlds and saves
     ├── logs/                           # Server logs
-    └── .cache/                         # Optimized cache
+    ├── .cache/                         # Optimized cache
+    └── .tokens/                        # Auto-refreshed tokens (created by entrypoint)
+        └── tokens.env                  # Saved OAuth and session tokens
 ```
 
 ### 🔧 Environment variables

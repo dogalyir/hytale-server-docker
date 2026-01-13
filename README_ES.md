@@ -121,35 +121,47 @@ El `auth.sh` automatiza todo el proceso OAuth2 Device Code Flow:
 docker-compose --env-file hytale_tokens.env up -d
 ```
 
-#### 🔄 Refresco automático de tokens
+#### 🔄 Gestión automática de tokens
 
-> ⚡ **Nueva característica**: Los tokens de sesión se refrescan automáticamente en cada inicio del servidor!
+> ⚡ **Gestión automática de tokens** - ¡El servidor hace todo por ti!
 
 **Cómo funciona:**
 
-1. El servidor verifica si hay tokens OAuth disponibles (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`)
-2. Si están disponibles, automáticamente:
+1. **Configuración inicial**: Ejecuta `./auth.sh` una vez para generar los tokens
+2. **Guardado automático**: Los tokens se guardan automáticamente en `hytale_data/.tokens/tokens.env`
+3. **Refresco automático**: En cada inicio del servidor, el entrypoint:
+   - Carga los tokens guardados desde `hytale_data/.tokens/`
    - Refresca el access token de OAuth usando el refresh_token
    - Crea una nueva sesión de juego con el access_token refrescado
-   - Guarda los nuevos tokens para la próxima vez
-3. El servidor inicia con tokens de sesión frescos cada vez
+   - Guarda todos los tokens actualizados
+4. **Operación continua**: ¡No necesitas preocuparte por refrescar tokens!
 
 **Expiración de tokens:**
 
-| Tipo de Token | Expiración |
-|--------------|------------|
-| OAuth Access Token | 1 hora (refrescado automáticamente) |
-| OAuth Refresh Token | 30 días |
-| Game Session | 1 hora (recreado en cada inicio) |
+| Tipo de Token | Expiración | ¿Auto-refrescado? |
+|--------------|------------|-------------------|
+| OAuth Access Token | 1 hora | ✅ Sí |
+| OAuth Refresh Token | 30 días | ❌ No (ejecutar `./auth.sh`) |
+| Game Session | 1 hora | ✅ Sí (en cada inicio) |
 
 **Refresco manual (si es necesario):**
 
 ```bash
-# Volver a ejecutar el script de autenticación para refrescar todos los tokens
+# Volver a ejecutar el script de autenticación para refrescar todos los tokens (cada 30 días)
 ./auth.sh
 ```
 
-> 💡 **Tip**: Solo proporciona los tokens de OAuth (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) en tu archivo `hytale_tokens.env`. Los tokens de sesión se refrescarán automáticamente en cada inicio del servidor!
+**Verificar estado de tokens:**
+
+```bash
+# Verificar validez de tokens y expiración
+./check-tokens.sh
+
+# O verificar tokens en un contenedor corriendo
+docker exec hytale-server /check-tokens.sh
+```
+
+> 💡 **Mejor práctica**: Proporciona los tokens de OAuth (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) una sola vez. El servidor los guardará automáticamente en `hytale_data/.tokens/` y refrescará los tokens de sesión en cada inicio!
 
 ---
 
@@ -162,7 +174,8 @@ hytale-docker/
 ├── 🐳 Dockerfile                      # Imagen del contenedor
 ├── 📦 docker-compose.yml               # Orquestación del servicio
 ├── 🔧 entrypoint.sh                    # Script de inicialización
-├── 🔑 auth.sh                          # Script de autenticación OAuth2
+├── 🔐 auth.sh                        # Script de autenticación OAuth2
+├── 🔍 check-tokens.sh                # Script de verificación de tokens
 ├── 💎 hytale_tokens.env                # Tokens generados (creado automáticamente)
 ├── 📝 hytale_tokens.env.example        # Ejemplo de archivo de tokens
 ├── 📚 README.md                        # Documentación en inglés
@@ -178,7 +191,9 @@ hytale-docker/
     ├── Assets.zip                      # Assets del juego
     ├── universe/                       # Mundos y saves
     ├── logs/                           # Logs del servidor
-    └── .cache/                         # Cache optimizado
+    ├── .cache/                         # Cache optimizado
+    └── .tokens/                        # Tokens auto-refrescados (creado por entrypoint)
+        └── tokens.env                  # Tokens OAuth y de sesión guardados
 ```
 
 ### 🔧 Variables de entorno
