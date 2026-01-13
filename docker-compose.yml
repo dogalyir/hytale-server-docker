@@ -1,7 +1,9 @@
 services:
   hytale_server:
+    image: ghcr.io/YOUR_USERNAME/your-repo:main
     platform: linux/amd64
-    build: .
+    # Uncomment below to build locally instead of using published image
+    # build: .
     container_name: hytale-server
     hostname: hytale.server.internal
     ports:

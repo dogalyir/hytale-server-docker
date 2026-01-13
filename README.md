@@ -45,13 +45,32 @@ Este proyecto está actualmente en fase de desarrollo. Puede haber cambios impor
 
 ## 🚀 Instalación
 
+### Opción A: Usar imagen publicada (recomendado)
+
 ```bash
 # Clonar el repositorio
 git clone <repo-url>
 cd HytaleDocker
 
-# Opcional: Copiar archivo de ejemplo para tokens
-cp hytale_tokens.env.example hytale_tokens.env
+# Modificar docker-compose.yml para usar tu imagen
+# Cambia YOUR_USERNAME/your-repo por tu nombre de repositorio real
+
+# Iniciar el servidor
+docker-compose up -d
+```
+
+### Opción B: Construir localmente
+
+```bash
+# Clonar el repositorio
+git clone <repo-url>
+cd HytaleDocker
+
+# Descomentar la línea 'build: .' en docker-compose.yml
+# Comentar la línea 'image: ...'
+
+# Construir e iniciar
+docker-compose up -d --build
 ```
 
 ---
@@ -115,22 +134,17 @@ Los tokens de sesión expiran en **1 hora**, los refresh tokens en **30 días**:
 
 ```
 hytale-docker/
-├── 🐳 Dockerfile                  # Imagen del contenedor
-├── 📦 docker-compose.yml           # Orquestación del servicio
-├── 🔧 entrypoint.sh                # Script de inicialización
-├── 🔑 auth.sh                      # Script de autenticación OAuth2
-├── 💎 hytale_tokens.env            # Tokens generados (creado automáticamente)
-├── 📝 hytale_tokens.env.example    # Ejemplo de archivo de tokens
-├── 📚 README.md                    # Esta documentación
-└── 🗄️ hytale_data/                 # Datos del servidor (creado automáticamente)
-    ├── Server/                     # Archivos del servidor
-    │   ├── HytaleServer.jar
-    │   ├── config.json
-    │   └── ...
-    ├── Assets.zip                  # Assets del juego
-    ├── universe/                   # Mundos y saves
-    ├── logs/                       # Logs del servidor
-    └── .cache/                     # Cache optimizado
+├── 🐳 Dockerfile                      # Imagen del contenedor
+├── 📦 docker-compose.yml               # Orquestación del servicio
+├── 🔧 entrypoint.sh                    # Script de inicialización
+├── 🔑 auth.sh                          # Script de autenticación OAuth2
+├── 💎 hytale_tokens.env                # Tokens generados (creado automáticamente)
+├── 📝 hytale_tokens.env.example        # Ejemplo de archivo de tokens
+├── 📚 README.md                        # Esta documentación
+├── 🔄 .github/
+│   └── workflows/
+│       └── docker-build.yml           # GitHub Actions workflow
+└── 🗄️ hytale_data/                     # Datos del servidor (creado automáticamente)
 ```
 
 ### 🔧 Variables de entorno
@@ -213,6 +227,7 @@ docker ps -a | grep hytale-server
 
 ## 🔗 Recursos
 
+- 🐳 [Docker Image](https://github.com/YOUR_USERNAME/your-repo/pkgs/container/your-repo)
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
 - 🔐 [Server Provider Authentication Guide](https://support.hytale.com/hc/en-us/articles/45328341414043-Server-Provider-Authentication-Guide)
 - 🎮 [Hytale Official Website](https://hytale.com/)
