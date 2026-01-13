@@ -7,228 +7,237 @@
 ![Docker](https://img.shields.io/badge/docker-supported-blue)
 ![Platform](https://img.shields.io/badge/platform-linux%2Famd64-orange)
 
-**Servidor de Hytale en contenedor Docker con descarga automática de assets y soporte para autenticación OAuth2**
+**Hytale server in Docker container with automatic asset download and OAuth2 authentication support**
 
-[Características](#-características) • [Instalación](#-instalación) • [Uso](#-uso) • [Configuración](#-configuración)
+[Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Configuration](#-configuration)
+
+[🇪🇸 Leer en español](README_ES.md)
 
 </div>
 
 ---
 
-## 📋 Estado
+## 📋 Status
 
-> 🚧 **En desarrollo**
+> 🚧 **Under Development**
 
-Este proyecto está actualmente en fase de desarrollo. Puede haber cambios importantes en la configuración y funcionalidades.
+This project is currently in development. Configuration and features may change significantly.
 
-## ✨ Características
+## ✨ Features
 
-- 🚀 **Descarga automática** de assets de Hytale mediante CLI oficial
-- 🔐 **Autenticación OAuth2** mediante Device Code Flow
-- 💾 **Persistencia de datos** en volúmenes Docker
-- ⚡ **Smart caching** - Solo descarga cuando es necesario
-- 🧹 **Limpieza automática** de archivos temporales
-- 🔄 **Modos flexibles** - Offline o Autenticado
-- 🏗️ **Multi-arquitectura** - Soporte para x86_64 y ARM64
-
----
-
-## 📦 Requisitos
-
-| Requisito | Versión mínima | Notas |
-|-----------|----------------|-------|
-| Docker | 20.10+ | [Instalar](https://docs.docker.com/get-docker/) |
-| Docker Compose | 2.0+ | [Instalar](https://docs.docker.com/compose/install/) |
-| macOS | Apple Silicon | Requiere emulación x86_64 |
+- 🚀 **Automatic download** of Hytale assets using the official CLI
+- 🔐 **OAuth2 authentication** via Device Code Flow
+- 💾 **Data persistence** using Docker volumes
+- ⚡ **Smart caching** - Only downloads when necessary
+- 🧹 **Automatic cleanup** of temporary files
+- 🔄 **Flexible modes** - Offline or Authenticated
+- 🏗️ **Multi-architecture** - Support for x86_64 and ARM64
 
 ---
 
-## 🚀 Instalación
+## 📦 Requirements
 
-### Opción A: Usar imagen publicada (recomendado)
+| Requirement | Minimum Version | Notes |
+|-------------|-----------------|-------|
+| Docker | 20.10+ | [Install](https://docs.docker.com/get-docker/) |
+| Docker Compose | 2.0+ | [Install](https://docs.docker.com/compose/install/) |
+| macOS | Apple Silicon | Requires x86_64 emulation |
+
+---
+
+## 🚀 Installation
+
+### Option A: Use published image (recommended)
 
 ```bash
-# Clonar el repositorio
+# Clone the repository
 git clone <repo-url>
 cd HytaleDocker
 
-# Importante: Modificar docker-compose.yml para usar tu imagen
-# Cambia ghcr.io/YOUR_USERNAME/your-repo:main
-# Por tu repositorio real, ejemplo: ghcr.io/johndoe/hytale-docker:main
+# Important: Modify docker-compose.yml to use your image
+# Change ghcr.io/YOUR_USERNAME/your-repo:main
+# To your actual repository, e.g., ghcr.io/johndoe/hytale-docker:main
 
-# Iniciar el servidor
+# Start the server
 docker-compose up -d
 ```
 
-> 💡 **Tip**: La imagen se construye automáticamente en GitHub Container Registry cada vez que haces push a la rama `main`.
+> 💡 **Tip**: The image is automatically built on GitHub Container Registry every time you push to the `main` branch.
 
-### Opción B: Construir localmente
+### Option B: Build locally
 
 ```bash
-# Clonar el repositorio
+# Clone the repository
 git clone <repo-url>
 cd HytaleDocker
 
-# Descomentar la línea 'build: .' en docker-compose.yml
-# Comentar la línea 'image: ...'
+# Uncomment the 'build: .' line in docker-compose.yml
+# Comment out the 'image: ...' line
 
-# Construir e iniciar
+# Build and start
 docker-compose up -d --build
 ```
 
----
+## 🎯 Usage
 
-## 🎯 Uso
+### 1️⃣ Offline Mode (no authentication)
 
-### 1️⃣ Modo Offline (sin autenticación)
-
-Para pruebas locales sin conexión a servicios de Hytale:
+For local testing without connection to Hytale services:
 
 ```bash
 docker-compose up -d
 ```
 
-### 2️⃣ Modo Autenticado (OAuth2 Device Code Flow)
+### 2️⃣ Authenticated Mode (OAuth2 Device Code Flow)
 
-Para producción y conexión con jugadores:
+For production and player connections:
 
-#### 📝 Paso 1: Obtener tokens de autenticación
+#### 📝 Step 1: Get authentication tokens
 
 ```bash
-# Ejecutar el script interactivo de autenticación
+# Run the interactive authentication script
 ./auth.sh
 ```
 
 <details>
-<summary>📖 ¿Qué hace el script?</summary>
+<summary>📖 What does the script do?</summary>
 
-El `auth.sh` automatiza todo el proceso OAuth2 Device Code Flow:
+The `auth.sh` script automates the entire OAuth2 Device Code Flow process:
 
-1. 🔄 Solicita un `device_code` a los servidores de Hytale OAuth
-2. 🌐 Muestra URL y código para autorización en navegador
-3. ⏳ Espera que completes la autorización (hasta 15 min)
-4. 🎉 Obtiene `access_token` y `refresh_token`
-5. 🎮 Crea sesión de juego mediante API
-6. 💾 Guarda tokens en `hytale_tokens.env`
+1. 🔄 Requests a `device_code` from Hytale OAuth servers
+2. 🌐 Displays URL and code for browser authorization
+3. ⏳ Waits for you to complete authorization (up to 15 min)
+4. 🎉 Obtains `access_token` and `refresh_token`
+5. 🎮 Creates a game session via API
+6. 💾 Saves tokens to `hytale_tokens.env`
 
 </details>
 
-#### 🚀 Paso 2: Iniciar el servidor autenticado
+#### 🚀 Step 2: Start authenticated server
 
 ```bash
-# Cargar tokens e iniciar el servidor
+# Load tokens and start the server
 docker-compose --env-file hytale_tokens.env up -d
 ```
 
-#### 🔄 Refrescar tokens
+#### 🔄 Refresh tokens
 
-Los tokens de sesión expiran en **1 hora**, los refresh tokens en **30 días**:
+Session tokens expire after **1 hour**, refresh tokens after **30 days**:
 
 ```bash
-# Refrescar tokens (usa refresh_token guardado)
+# Refresh tokens (uses saved refresh_token)
 ./auth.sh
 ```
 
 ---
 
-## ⚙️ Configuración
+## ⚙️ Configuration
 
-### 📂 Estructura de archivos
+### 📂 File structure
 
 ```
 hytale-docker/
-├── 🐳 Dockerfile                      # Imagen del contenedor
-├── 📦 docker-compose.yml               # Orquestación del servicio
-├── 🔧 entrypoint.sh                    # Script de inicialización
-├── 🔑 auth.sh                          # Script de autenticación OAuth2
-├── 💎 hytale_tokens.env                # Tokens generados (creado automáticamente)
-├── 📝 hytale_tokens.env.example        # Ejemplo de archivo de tokens
-├── 📚 README.md                        # Esta documentación
+├── 🐳 Dockerfile                      # Container image
+├── 📦 docker-compose.yml               # Service orchestration
+├── 🔧 entrypoint.sh                    # Initialization script
+├── 🔑 auth.sh                          # OAuth2 authentication script
+├── 💎 hytale_tokens.env                # Generated tokens (created automatically)
+├── 📝 hytale_tokens.env.example        # Token file example
+├── 📚 README.md                        # This documentation
+├── 📚 README_ES.md                     # Spanish documentation
 ├── 🔄 .github/
 │   └── workflows/
 │       └── docker-build.yml           # GitHub Actions workflow
-└── 🗄️ hytale_data/                     # Datos del servidor (creado automáticamente)
+└── 🗄️ hytale_data/                     # Server data (created automatically)
+    ├── Server/                         # Server files
+    │   ├── HytaleServer.jar
+    │   ├── config.json
+    │   └── ...
+    ├── Assets.zip                      # Game assets
+    ├── universe/                       # Worlds and saves
+    ├── logs/                           # Server logs
+    └── .cache/                         # Optimized cache
 ```
 
-### 🔧 Variables de entorno
+### 🔧 Environment variables
 
-| Variable | Descripción | Default |
+| Variable | Description | Default |
 |----------|-------------|---------|
-| `HYTALE_SERVER_SESSION_TOKEN` | Token de sesión del servidor (JWT) | - |
-| `HYTALE_SERVER_IDENTITY_TOKEN` | Token de identidad del servidor (JWT) | - |
-| `WORKDIR` | Directorio de trabajo del servidor | `/app` |
+| `HYTALE_SERVER_SESSION_TOKEN` | Server session token (JWT) | - |
+| `HYTALE_SERVER_IDENTITY_TOKEN` | Server identity token (JWT) | - |
+| `WORKDIR` | Server working directory | `/app` |
 
-### 🌐 Puertos
+### 🌐 Ports
 
-| Puerto | Protocolo | Descripción |
-|--------|-----------|-------------|
-| `5520` | UDP | Puerto por defecto del servidor Hytale (QUIC) |
+| Port | Protocol | Description |
+|------|----------|-------------|
+| `5520` | UDP | Default Hytale server port (QUIC) |
 
-> ⚠️ **Importante**: Hytale usa **QUIC sobre UDP**, no TCP. Asegúrate de configurar firewalls y port forwarding correctamente.
+> ⚠️ **Important**: Hytale uses **QUIC over UDP**, not TCP. Make sure to configure firewalls and port forwarding correctly.
 >
-> 🔧 Para cambiar el puerto, modifica el archivo `docker-compose.yml` o usa la variable de entorno del servidor.
+> 🔧 To change the port, modify the `docker-compose.yml` file or use the server's environment variable.
 
 ---
 
-## 🛠️ Comandos útiles
+## 🛠️ Useful commands
 
 ```bash
-# Ver logs del servidor en tiempo real
+# View server logs in real-time
 docker-compose logs -f
 
-# Detener el servidor
+# Stop the server
 docker-compose down
 
-# Reconstruir la imagen desde cero
+# Rebuild image from scratch
 docker-compose build --no-cache
 
-# Reiniciar el servidor
+# Restart the server
 docker-compose restart
 
-# Limpiar todos los datos del servidor (¡cuidado!)
+# Clean all server data (careful!)
 rm -rf hytale_data/
 
-# Verificar estado del contenedor
+# Check container status
 docker ps -a | grep hytale-server
 ```
 
 ---
 
-## 📝 Notas importantes
+## 📝 Important notes
 
 <details>
-<summary>🔒 Sobre la autenticación</summary>
+<summary>🔒 About authentication</summary>
 
-- El servidor requiere autenticación para aceptar conexiones de jugadores
-- Los tokens de sesión expiran cada hora, el servidor intenta refrescarlos automáticamente
-- Para producción, considera implementar refresco automático de tokens
-- El límite predeterminado es de **100 servidores concurrentes** por licencia de juego
+- The server requires authentication to accept player connections
+- Session tokens expire every hour, the server attempts to refresh them automatically
+- For production, consider implementing automatic token refresh
+- Default limit is **100 concurrent servers** per game license
 
 </details>
 
 <details>
-<summary>💡 Sobre el rendimiento</summary>
+<summary>💡 About performance</summary>
 
-- RAM mínima: **4GB** (recomendado 8GB+ para múltiples jugadores)
-- El servidor usa protocolo **QUIC** para mejor rendimiento
-- Considera limitar la `view distance` para reducir consumo de RAM
-- Los assets se descargan solo la primera vez o cuando se actualizan
+- Minimum RAM: **4GB** (8GB+ recommended for multiple players)
+- The server uses **QUIC** protocol for better performance
+- Consider limiting `view distance` to reduce RAM usage
+- Assets are downloaded only the first time or when updated
 
 </details>
 
 <details>
-<summary>🔄 Sobre las actualizaciones</summary>
+<summary>🔄 About updates</summary>
 
-- Los archivos del servidor se mantienen en `hytale_data/`
-- Para actualizar, borra `hytale_data/Server/` y reinicia el servidor
-- Los mundos y configuraciones en `universe/` se conservan
-- Los assets se verifican automáticamente al inicio
+- Server files are kept in `hytale_data/`
+- To update, delete `hytale_data/Server/` and restart the server
+- Worlds and configurations in `universe/` are preserved
+- Assets are automatically verified on startup
 
 </details>
 
 ---
 
-## 🔗 Recursos
+## 🔗 Resources
 
 - 🐳 [Docker Image](https://github.com/YOUR_USERNAME/your-repo/pkgs/container/your-repo)
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
@@ -238,16 +247,16 @@ docker ps -a | grep hytale-server
 
 ---
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 <div align="center">
 
-**Hecho con ❤️ para la comunidad de Hytale**
+**Made with ❤️ for the Hytale community**
 
-[⬆ Volver al inicio](#-hytale-docker-server)
+[⬆ Back to top](#-hytale-docker-server)
 
 </div>
