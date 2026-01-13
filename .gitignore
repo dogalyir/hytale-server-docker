@@ -1,11 +1,17 @@
 # Downloaded Hytale data
 hytale_data/
 
+# Authentication tokens
+hytale_tokens.env
+
 # Logs
 *.log
 
 # Temporary files
 *.zip
+
+# Documentation
+*.txt
 
 # OS files
 .DS_Store

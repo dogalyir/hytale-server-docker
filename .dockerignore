@@ -1,6 +1,9 @@
 # Downloaded Hytale data
 hytale_data/
 
+# Authentication tokens
+hytale_tokens.env
+
 # Git
 .git
 .gitignore

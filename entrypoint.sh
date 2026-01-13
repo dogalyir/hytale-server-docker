@@ -70,7 +70,18 @@ check_assets_exist() {
 
 start_server() {
     log_info "Starting Hytale server..."
-    exec java -jar "${WORKDIR}/Server/HytaleServer.jar" --assets "${WORKDIR}/Assets.zip" "$@"
+
+    local server_args="--assets ${WORKDIR}/Assets.zip"
+
+    if [ -n "${HYTALE_SERVER_SESSION_TOKEN}" ] && [ -n "${HYTALE_SERVER_IDENTITY_TOKEN}" ]; then
+        log_info "Authentication tokens provided, starting in authenticated mode"
+        server_args="${server_args} --session-token ${HYTALE_SERVER_SESSION_TOKEN}"
+        server_args="${server_args} --identity-token ${HYTALE_SERVER_IDENTITY_TOKEN}"
+    else
+        log_info "No authentication tokens provided, starting in offline mode"
+    fi
+
+    exec java -jar "${WORKDIR}/Server/HytaleServer.jar" ${server_args} "$@"
 }
 
 main() {

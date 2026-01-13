@@ -8,5 +8,7 @@ services:
       - "25565:25565"
     environment:
       - WORKDIR=/app
+      - HYTALE_SERVER_SESSION_TOKEN=${HYTALE_SERVER_SESSION_TOKEN:-}
+      - HYTALE_SERVER_IDENTITY_TOKEN=${HYTALE_SERVER_IDENTITY_TOKEN:-}
     volumes:
       - ./hytale_data:/app
