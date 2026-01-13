@@ -27,6 +27,7 @@ Este proyecto está actualmente en fase de desarrollo. Puede haber cambios impor
 
 - 🚀 **Descarga automática** de assets de Hytale mediante CLI oficial
 - 🔐 **Autenticación OAuth2** mediante Device Code Flow
+- 🔄 **Refresco automático de tokens** - Tokens de sesión se refrescan en cada inicio
 - 💾 **Persistencia de datos** en volúmenes Docker
 - ⚡ **Smart caching** - Solo descarga cuando es necesario
 - 🧹 **Limpieza automática** de archivos temporales
@@ -55,8 +56,8 @@ git clone <repo-url>
 cd HytaleDocker
 
 # Importante: Modificar docker-compose.yml para usar tu imagen
-# Cambia ghcr.io/YOUR_USERNAME/your-repo:main
-# Por tu repositorio real, ejemplo: ghcr.io/johndoe/hytale-docker:main
+# ghcr.io/dogalyir/hytale-server-docker:main
+# Esta imagen se construye automáticamente en GitHub Container Registry cuando haces push a main
 
 # Iniciar el servidor
 docker-compose up -d
@@ -120,14 +121,35 @@ El `auth.sh` automatiza todo el proceso OAuth2 Device Code Flow:
 docker-compose --env-file hytale_tokens.env up -d
 ```
 
-#### 🔄 Refrescar tokens
+#### 🔄 Refresco automático de tokens
 
-Los tokens de sesión expiran en **1 hora**, los refresh tokens en **30 días**:
+> ⚡ **Nueva característica**: Los tokens de sesión se refrescan automáticamente en cada inicio del servidor!
+
+**Cómo funciona:**
+
+1. El servidor verifica si hay tokens OAuth disponibles (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`)
+2. Si están disponibles, automáticamente:
+   - Refresca el access token de OAuth usando el refresh_token
+   - Crea una nueva sesión de juego con el access_token refrescado
+   - Guarda los nuevos tokens para la próxima vez
+3. El servidor inicia con tokens de sesión frescos cada vez
+
+**Expiración de tokens:**
+
+| Tipo de Token | Expiración |
+|--------------|------------|
+| OAuth Access Token | 1 hora (refrescado automáticamente) |
+| OAuth Refresh Token | 30 días |
+| Game Session | 1 hora (recreado en cada inicio) |
+
+**Refresco manual (si es necesario):**
 
 ```bash
-# Refrescar tokens (usa refresh_token guardado)
+# Volver a ejecutar el script de autenticación para refrescar todos los tokens
 ./auth.sh
 ```
+
+> 💡 **Tip**: Solo proporciona los tokens de OAuth (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) en tu archivo `hytale_tokens.env`. Los tokens de sesión se refrescarán automáticamente en cada inicio del servidor!
 
 ---
 
@@ -163,8 +185,11 @@ hytale-docker/
 
 | Variable | Descripción | Default |
 |----------|-------------|---------|
-| `HYTALE_SERVER_SESSION_TOKEN` | Token de sesión del servidor (JWT) | - |
-| `HYTALE_SERVER_IDENTITY_TOKEN` | Token de identidad del servidor (JWT) | - |
+| `HYTALE_SERVER_SESSION_TOKEN` | Token de sesión del servidor (JWT, refrescado automáticamente) | - |
+| `HYTALE_SERVER_IDENTITY_TOKEN` | Token de identidad del servidor (JWT, refrescado automáticamente) | - |
+| `HYTALE_ACCESS_TOKEN` | OAuth access token (para auto-refresco) | - |
+| `HYTALE_REFRESH_TOKEN` | OAuth refresh token (válido 30 días) | - |
+| `HYTALE_PROFILE_UUID` | UUID del perfil para crear sesión | - |
 | `WORKDIR` | Directorio de trabajo del servidor | `/app` |
 
 ### 🌐 Puertos
@@ -209,8 +234,13 @@ docker ps -a | grep hytale-server
 <summary>🔒 Sobre la autenticación</summary>
 
 - El servidor requiere autenticación para aceptar conexiones de jugadores
-- Los tokens de sesión expiran cada hora, el servidor intenta refrescarlos automáticamente
-- Para producción, considera implementar refresco automático de tokens
+- Los tokens de sesión expiran cada hora y se **refrescan automáticamente** al iniciar el servidor si se proporcionan tokens OAuth
+- Los refresh tokens de OAuth son válidos por 30 días - después necesitas volver a ejecutar `./auth.sh`
+- El sistema de refresco automático usa el siguiente flujo:
+  1. Servidor inicia → entrypoint verifica tokens OAuth
+  2. Refresca el access token de OAuth usando refresh_token
+  3. Crea nueva sesión de juego con el access_token fresco
+  4. Guarda todos los nuevos tokens para el próximo reinicio
 - El límite predeterminado es de **100 servidores concurrentes** por licencia de juego
 
 </details>
@@ -239,7 +269,7 @@ docker ps -a | grep hytale-server
 
 ## 🔗 Recursos
 
-- 🐳 [Docker Image](https://github.com/YOUR_USERNAME/your-repo/pkgs/container/your-repo)
+- 🐳 [Docker Image](https://github.com/dogalyir/hytale-server-docker/pkgs/container/hytale-server-docker)
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
 - 🔐 [Server Provider Authentication Guide](https://support.hytale.com/hc/en-us/articles/45328341414043-Server-Provider-Authentication-Guide)
 - 🎮 [Hytale Official Website](https://hytale.com/)

@@ -27,6 +27,7 @@ This project is currently in development. Configuration and features may change 
 
 - 🚀 **Automatic download** of Hytale assets using the official CLI
 - 🔐 **OAuth2 authentication** via Device Code Flow
+- 🔄 **Automatic token refresh** - Session tokens refresh on every server start
 - 💾 **Data persistence** using Docker volumes
 - ⚡ **Smart caching** - Only downloads when necessary
 - 🧹 **Automatic cleanup** of temporary files
@@ -55,8 +56,8 @@ git clone <repo-url>
 cd HytaleDocker
 
 # Important: Modify docker-compose.yml to use your image
-# Change ghcr.io/YOUR_USERNAME/your-repo:main
-# To your actual repository, e.g., ghcr.io/johndoe/hytale-docker:main
+# ghcr.io/dogalyir/hytale-server-docker:main
+# This will automatically be built on GitHub Container Registry when you push to main
 
 # Start the server
 docker-compose up -d
@@ -120,14 +121,35 @@ The `auth.sh` script automates the entire OAuth2 Device Code Flow process:
 docker-compose --env-file hytale_tokens.env up -d
 ```
 
-#### 🔄 Refresh tokens
+#### 🔄 Automatic token refresh
 
-Session tokens expire after **1 hour**, refresh tokens after **30 days**:
+> ⚡ **New feature**: Session tokens are automatically refreshed on every server start!
+
+**How it works:**
+
+1. The server checks if OAuth tokens (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) are available
+2. If available, it automatically:
+   - Refreshes the OAuth access token using the refresh token
+   - Creates a new game session with the refreshed access token
+   - Saves the new tokens for next time
+3. The server starts with fresh session tokens every time
+
+**Token expiration:**
+
+| Token Type | Expiration |
+|------------|------------|
+| OAuth Access Token | 1 hour (auto-refreshed) |
+| OAuth Refresh Token | 30 days |
+| Game Session | 1 hour (recreated on every start) |
+
+**Manual refresh (if needed):**
 
 ```bash
-# Refresh tokens (uses saved refresh_token)
+# Re-run the auth script to refresh all tokens
 ./auth.sh
 ```
+
+> 💡 **Tip**: Just provide the OAuth tokens (`HYTALE_ACCESS_TOKEN`, `HYTALE_REFRESH_TOKEN`, `HYTALE_PROFILE_UUID`) in your `hytale_tokens.env` file. The session tokens will be automatically refreshed on every server start!
 
 ---
 
@@ -163,8 +185,11 @@ hytale-docker/
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `HYTALE_SERVER_SESSION_TOKEN` | Server session token (JWT) | - |
-| `HYTALE_SERVER_IDENTITY_TOKEN` | Server identity token (JWT) | - |
+| `HYTALE_SERVER_SESSION_TOKEN` | Server session token (JWT, auto-refreshed) | - |
+| `HYTALE_SERVER_IDENTITY_TOKEN` | Server identity token (JWT, auto-refreshed) | - |
+| `HYTALE_ACCESS_TOKEN` | OAuth access token (for auto-refresh) | - |
+| `HYTALE_REFRESH_TOKEN` | OAuth refresh token (valid 30 days) | - |
+| `HYTALE_PROFILE_UUID` | Profile UUID for session creation | - |
 | `WORKDIR` | Server working directory | `/app` |
 
 ### 🌐 Ports
@@ -209,8 +234,13 @@ docker ps -a | grep hytale-server
 <summary>🔒 About authentication</summary>
 
 - The server requires authentication to accept player connections
-- Session tokens expire every hour, the server attempts to refresh them automatically
-- For production, consider implementing automatic token refresh
+- Session tokens expire every hour and are **automatically refreshed** on server start if OAuth tokens are provided
+- OAuth refresh tokens are valid for 30 days - after that, you need to re-run `./auth.sh`
+- The automatic refresh system uses the following flow:
+  1. Server starts → entrypoint checks for OAuth tokens
+  2. Refreshes OAuth access token using refresh_token
+  3. Creates new game session with fresh access token
+  4. Saves all new tokens for next restart
 - Default limit is **100 concurrent servers** per game license
 
 </details>
@@ -239,7 +269,7 @@ docker ps -a | grep hytale-server
 
 ## 🔗 Resources
 
-- 🐳 [Docker Image](https://github.com/YOUR_USERNAME/your-repo/pkgs/container/your-repo)
+- 🐳 [Docker Image](https://github.com/dogalyir/hytale-server-docker/pkgs/container/hytale-server-docker)
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
 - 🔐 [Server Provider Authentication Guide](https://support.hytale.com/hc/en-us/articles/45328341414043-Server-Provider-Authentication-Guide)
 - 🎮 [Hytale Official Website](https://hytale.com/)

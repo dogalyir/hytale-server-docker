@@ -1,6 +1,6 @@
 services:
   hytale_server:
-    image: ghcr.io/YOUR_USERNAME/your-repo:main
+    image: ghcr.io/dogalyir/hytale-server-docker:main
     platform: linux/amd64
     # Uncomment below to build locally instead of using published image
     # build: .
@@ -12,5 +12,8 @@ services:
       - WORKDIR=/app
       - HYTALE_SERVER_SESSION_TOKEN=${HYTALE_SERVER_SESSION_TOKEN:-}
       - HYTALE_SERVER_IDENTITY_TOKEN=${HYTALE_SERVER_IDENTITY_TOKEN:-}
+      - HYTALE_ACCESS_TOKEN=${HYTALE_ACCESS_TOKEN:-}
+      - HYTALE_REFRESH_TOKEN=${HYTALE_REFRESH_TOKEN:-}
+      - HYTALE_PROFILE_UUID=${HYTALE_PROFILE_UUID:-}
     volumes:
       - ./hytale_data:/app
