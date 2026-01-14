@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Status](https://img.shields.io/badge/status-dev-yellow)
+![Status](https://img.shields.io/badge/status-working-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Docker](https://img.shields.io/badge/docker-supported-blue)
 ![Platform](https://img.shields.io/badge/platform-linux%2Famd64-orange)
@@ -11,7 +11,7 @@
 
 [Features](#-features) • [Installation](#-installation) • [Usage](#-usage) • [Configuration](#-configuration)
 
-[🇪🇸 Leer en español](README_ES.md)
+[🇪🇸 Leer en español](README_ES.md) • [💬 Join Discord](https://discord.gg/EPnFKFsMq8)
 
 </div>
 
@@ -19,9 +19,9 @@
 
 ## 📋 Status
 
-> 🚧 **Under Development**
+> ✅ **Working & Production Ready**
 
-This project is currently in development. Configuration and features may change significantly.
+This project is fully functional and ready for production use. All features are working as intended.
 
 ## ✨ Features
 
@@ -288,7 +288,8 @@ docker ps -a | grep hytale-server
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
 - 🔐 [Server Provider Authentication Guide](https://support.hytale.com/hc/en-us/articles/45328341414043-Server-Provider-Authentication-Guide)
 - 🎮 [Hytale Official Website](https://hytale.com/)
-- 💬 [Hytale Discord](https://discord.gg/hytale)
+- 💬 [Hytale Official Discord](https://discord.gg/hytale)
+- 🤝 [Join our Community Discord](https://discord.gg/EPnFKFsMq8)
 
 ---
 

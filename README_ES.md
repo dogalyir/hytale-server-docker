@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Status](https://img.shields.io/badge/status-dev-yellow)
+![Status](https://img.shields.io/badge/status-working-success)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Docker](https://img.shields.io/badge/docker-supported-blue)
 ![Platform](https://img.shields.io/badge/platform-linux%2Famd64-orange)
@@ -11,7 +11,7 @@
 
 [Características](#-características) • [Instalación](#-instalación) • [Uso](#-uso) • [Configuración](#-configuración)
 
-[🇺🇸 Read in English](README.md)
+[🇺🇸 Read in English](README.md) • [💬 Únete al Discord](https://discord.gg/EPnFKFsMq8)
 
 </div>
 
@@ -19,9 +19,9 @@
 
 ## 📋 Estado
 
-> 🚧 **En desarrollo**
+> ✅ **Funcionando y listo para producción**
 
-Este proyecto está actualmente en fase de desarrollo. Puede haber cambios importantes en la configuración y funcionalidades.
+Este proyecto es completamente funcional y listo para uso en producción. Todas las características funcionan como se pretende.
 
 ## ✨ Características
 
@@ -31,6 +31,7 @@ Este proyecto está actualmente en fase de desarrollo. Puede haber cambios impor
 - 💾 **Persistencia de datos** en volúmenes Docker
 - ⚡ **Smart caching** - Solo descarga cuando es necesario
 - 🧹 **Limpieza automática** de archivos temporales
+- 🔍 **Verificación de tokens** - Fácil chequeo de estado de tokens
 - 🔄 **Modos flexibles** - Offline o Autenticado
 - 🏗️ **Multi-arquitectura** - Soporte para x86_64 y ARM64
 
@@ -288,7 +289,8 @@ docker ps -a | grep hytale-server
 - 📚 [Hytale Server Manual](https://support.hytale.com/hc/en-us/articles/45326769420827-Hytale-Server-Manual)
 - 🔐 [Server Provider Authentication Guide](https://support.hytale.com/hc/en-us/articles/45328341414043-Server-Provider-Authentication-Guide)
 - 🎮 [Hytale Official Website](https://hytale.com/)
-- 💬 [Hytale Discord](https://discord.gg/hytale)
+- 💬 [Discord Oficial de Hytale](https://discord.gg/hytale)
+- 🤝 [Únete a nuestro Discord](https://discord.gg/EPnFKFsMq8)
 
 ---
 
